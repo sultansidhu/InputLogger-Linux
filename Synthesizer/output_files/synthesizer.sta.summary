@@ -1,0 +1,133 @@
+------------------------------------------------------------
+Timing Analyzer Summary
+------------------------------------------------------------
+
+Type  : Slow 1100mV 85C Model Setup 'control:c0|current_state.UPDATE_PHASE'
+Slack : -5.243
+TNS   : -41.919
+
+Type  : Slow 1100mV 85C Model Setup 'CLOCK_50'
+Slack : -4.712
+TNS   : -1766.647
+
+Type  : Slow 1100mV 85C Model Hold 'CLOCK_50'
+Slack : 0.309
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Hold 'control:c0|current_state.UPDATE_PHASE'
+Slack : 0.684
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'CLOCK_50'
+Slack : -2.174
+TNS   : -645.847
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'control:c0|current_state.UPDATE_PHASE'
+Slack : -0.394
+TNS   : -4.088
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'my_clock_gen|DE_Clock_Generator_Audio|auto_generated|generic_pll1~FRACTIONAL_PLL|vcoph[0]'
+Slack : 1.322
+TNS   : 0.000
+
+Type  : Slow 1100mV 85C Model Minimum Pulse Width 'CLOCK2_50'
+Slack : 18.418
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Setup 'control:c0|current_state.UPDATE_PHASE'
+Slack : -5.336
+TNS   : -42.663
+
+Type  : Slow 1100mV 0C Model Setup 'CLOCK_50'
+Slack : -4.620
+TNS   : -1717.461
+
+Type  : Slow 1100mV 0C Model Hold 'CLOCK_50'
+Slack : 0.234
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Hold 'control:c0|current_state.UPDATE_PHASE'
+Slack : 0.672
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'CLOCK_50'
+Slack : -2.174
+TNS   : -668.376
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'control:c0|current_state.UPDATE_PHASE'
+Slack : -0.394
+TNS   : -4.112
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'my_clock_gen|DE_Clock_Generator_Audio|auto_generated|generic_pll1~FRACTIONAL_PLL|vcoph[0]'
+Slack : 1.322
+TNS   : 0.000
+
+Type  : Slow 1100mV 0C Model Minimum Pulse Width 'CLOCK2_50'
+Slack : 18.444
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Setup 'CLOCK_50'
+Slack : -3.077
+TNS   : -816.775
+
+Type  : Fast 1100mV 85C Model Setup 'control:c0|current_state.UPDATE_PHASE'
+Slack : -2.595
+TNS   : -20.750
+
+Type  : Fast 1100mV 85C Model Hold 'CLOCK_50'
+Slack : 0.179
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Hold 'control:c0|current_state.UPDATE_PHASE'
+Slack : 0.354
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'CLOCK_50'
+Slack : -2.174
+TNS   : -375.213
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'control:c0|current_state.UPDATE_PHASE'
+Slack : 0.143
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'my_clock_gen|DE_Clock_Generator_Audio|auto_generated|generic_pll1~FRACTIONAL_PLL|vcoph[0]'
+Slack : 1.322
+TNS   : 0.000
+
+Type  : Fast 1100mV 85C Model Minimum Pulse Width 'CLOCK2_50'
+Slack : 18.161
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Setup 'control:c0|current_state.UPDATE_PHASE'
+Slack : -2.487
+TNS   : -19.886
+
+Type  : Fast 1100mV 0C Model Setup 'CLOCK_50'
+Slack : -2.470
+TNS   : -699.371
+
+Type  : Fast 1100mV 0C Model Hold 'CLOCK_50'
+Slack : 0.126
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Hold 'control:c0|current_state.UPDATE_PHASE'
+Slack : 0.318
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'CLOCK_50'
+Slack : -2.174
+TNS   : -375.272
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'control:c0|current_state.UPDATE_PHASE'
+Slack : 0.142
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'my_clock_gen|DE_Clock_Generator_Audio|auto_generated|generic_pll1~FRACTIONAL_PLL|vcoph[0]'
+Slack : 1.322
+TNS   : 0.000
+
+Type  : Fast 1100mV 0C Model Minimum Pulse Width 'CLOCK2_50'
+Slack : 18.150
+TNS   : 0.000
+
+------------------------------------------------------------

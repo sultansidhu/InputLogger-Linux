@@ -1,0 +1,71 @@
+
+State Machine - |synthesizer|audio_and_video_config:cfg|Altera_UP_I2C:I2C_Controller|s_i2c_transceiver
+Name s_i2c_transceiver.I2C_STATE_6_COMPLETE s_i2c_transceiver.I2C_STATE_5_STOP_BIT s_i2c_transceiver.I2C_STATE_4_TRANSFER_ACK s_i2c_transceiver.I2C_STATE_3_TRANSFER_BYTE s_i2c_transceiver.I2C_STATE_2_START_BIT s_i2c_transceiver.I2C_STATE_1_PRE_START s_i2c_transceiver.I2C_STATE_0_IDLE 
+s_i2c_transceiver.I2C_STATE_0_IDLE 0 0 0 0 0 0 0 
+s_i2c_transceiver.I2C_STATE_1_PRE_START 0 0 0 0 0 1 1 
+s_i2c_transceiver.I2C_STATE_2_START_BIT 0 0 0 0 1 0 1 
+s_i2c_transceiver.I2C_STATE_3_TRANSFER_BYTE 0 0 0 1 0 0 1 
+s_i2c_transceiver.I2C_STATE_4_TRANSFER_ACK 0 0 1 0 0 0 1 
+s_i2c_transceiver.I2C_STATE_5_STOP_BIT 0 1 0 0 0 0 1 
+s_i2c_transceiver.I2C_STATE_6_COMPLETE 1 0 0 0 0 0 1 
+
+State Machine - |synthesizer|audio_and_video_config:cfg|Altera_UP_I2C_AV_Auto_Initialize:Auto_Initialize|s_i2c_auto_init
+Name s_i2c_auto_init.AUTO_STATE_7_DONE s_i2c_auto_init.AUTO_STATE_6_INCREASE_COUNTER s_i2c_auto_init.AUTO_STATE_5_SEND_STOP_BIT s_i2c_auto_init.AUTO_STATE_4_WAIT s_i2c_auto_init.AUTO_STATE_3_TRANSFER_BYTE_2 s_i2c_auto_init.AUTO_STATE_2_TRANSFER_BYTE_1 s_i2c_auto_init.AUTO_STATE_1_SEND_START_BIT s_i2c_auto_init.AUTO_STATE_0_CHECK_STATUS 
+s_i2c_auto_init.AUTO_STATE_0_CHECK_STATUS 0 0 0 0 0 0 0 0 
+s_i2c_auto_init.AUTO_STATE_1_SEND_START_BIT 0 0 0 0 0 0 1 1 
+s_i2c_auto_init.AUTO_STATE_2_TRANSFER_BYTE_1 0 0 0 0 0 1 0 1 
+s_i2c_auto_init.AUTO_STATE_3_TRANSFER_BYTE_2 0 0 0 0 1 0 0 1 
+s_i2c_auto_init.AUTO_STATE_4_WAIT 0 0 0 1 0 0 0 1 
+s_i2c_auto_init.AUTO_STATE_5_SEND_STOP_BIT 0 0 1 0 0 0 0 1 
+s_i2c_auto_init.AUTO_STATE_6_INCREASE_COUNTER 0 1 0 0 0 0 0 1 
+s_i2c_auto_init.AUTO_STATE_7_DONE 1 0 0 0 0 0 0 1 
+
+State Machine - |synthesizer|control:c0|current_state
+Name current_state.UPDATE_PHASE current_state.WRITE_DATA current_state.LISTEN_WRITE_READY current_state.LOAD_AMP_REG current_state.KEYBOARD_LISTEN current_state.LOAD_RELEASE_WAIT current_state.LOAD_RELEASE current_state.LOAD_SUSTAIN_WAIT current_state.LOAD_SUSTAIN current_state.LOAD_DECAY_WAIT current_state.LOAD_DECAY current_state.LOAD_ATTACK_WAIT current_state.LOAD_ATTACK 
+current_state.LOAD_ATTACK 0 0 0 0 0 0 0 0 0 0 0 0 0 
+current_state.LOAD_ATTACK_WAIT 0 0 0 0 0 0 0 0 0 0 0 1 1 
+current_state.LOAD_DECAY 0 0 0 0 0 0 0 0 0 0 1 0 1 
+current_state.LOAD_DECAY_WAIT 0 0 0 0 0 0 0 0 0 1 0 0 1 
+current_state.LOAD_SUSTAIN 0 0 0 0 0 0 0 0 1 0 0 0 1 
+current_state.LOAD_SUSTAIN_WAIT 0 0 0 0 0 0 0 1 0 0 0 0 1 
+current_state.LOAD_RELEASE 0 0 0 0 0 0 1 0 0 0 0 0 1 
+current_state.LOAD_RELEASE_WAIT 0 0 0 0 0 1 0 0 0 0 0 0 1 
+current_state.KEYBOARD_LISTEN 0 0 0 0 1 0 0 0 0 0 0 0 1 
+current_state.LOAD_AMP_REG 0 0 0 1 0 0 0 0 0 0 0 0 1 
+current_state.LISTEN_WRITE_READY 0 0 1 0 0 0 0 0 0 0 0 0 1 
+current_state.WRITE_DATA 0 1 0 0 0 0 0 0 0 0 0 0 1 
+current_state.UPDATE_PHASE 1 0 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |synthesizer|keyboard_tracker:kt0|curr_state
+Name curr_state.SECONDARY_BREAK curr_state.SECONDARY_MAKE curr_state.BREAK curr_state.MAKE 
+curr_state.MAKE 0 0 0 0 
+curr_state.BREAK 0 0 1 1 
+curr_state.SECONDARY_MAKE 0 1 0 1 
+curr_state.SECONDARY_BREAK 1 0 0 1 
+
+State Machine - |synthesizer|keyboard_tracker:kt0|PS2_Controller:core_driver|s_ps2_transceiver
+Name s_ps2_transceiver.PS2_STATE_3_END_TRANSFER s_ps2_transceiver.PS2_STATE_2_COMMAND_OUT s_ps2_transceiver.PS2_STATE_1_DATA_IN s_ps2_transceiver.PS2_STATE_0_IDLE s_ps2_transceiver.PS2_STATE_4_END_DELAYED 
+s_ps2_transceiver.PS2_STATE_0_IDLE 0 0 0 0 0 
+s_ps2_transceiver.PS2_STATE_1_DATA_IN 0 0 1 1 0 
+s_ps2_transceiver.PS2_STATE_2_COMMAND_OUT 0 1 0 1 0 
+s_ps2_transceiver.PS2_STATE_3_END_TRANSFER 1 0 0 1 0 
+s_ps2_transceiver.PS2_STATE_4_END_DELAYED 0 0 0 1 1 
+
+State Machine - |synthesizer|keyboard_tracker:kt0|PS2_Controller:core_driver|Altera_UP_PS2_Command_Out:PS2_Command_Out|s_ps2_transmitter
+Name s_ps2_transmitter.PS2_STATE_7_TRANSMISSION_ERROR s_ps2_transmitter.PS2_STATE_6_COMMAND_WAS_SENT s_ps2_transmitter.PS2_STATE_5_RECEIVE_ACK_BIT s_ps2_transmitter.PS2_STATE_4_TRANSMIT_STOP_BIT s_ps2_transmitter.PS2_STATE_3_TRANSMIT_DATA s_ps2_transmitter.PS2_STATE_2_WAIT_FOR_CLOCK s_ps2_transmitter.PS2_STATE_1_INITIATE_COMMUNICATION s_ps2_transmitter.PS2_STATE_0_IDLE 
+s_ps2_transmitter.PS2_STATE_0_IDLE 0 0 0 0 0 0 0 0 
+s_ps2_transmitter.PS2_STATE_1_INITIATE_COMMUNICATION 0 0 0 0 0 0 1 1 
+s_ps2_transmitter.PS2_STATE_2_WAIT_FOR_CLOCK 0 0 0 0 0 1 0 1 
+s_ps2_transmitter.PS2_STATE_3_TRANSMIT_DATA 0 0 0 0 1 0 0 1 
+s_ps2_transmitter.PS2_STATE_4_TRANSMIT_STOP_BIT 0 0 0 1 0 0 0 1 
+s_ps2_transmitter.PS2_STATE_5_RECEIVE_ACK_BIT 0 0 1 0 0 0 0 1 
+s_ps2_transmitter.PS2_STATE_6_COMMAND_WAS_SENT 0 1 0 0 0 0 0 1 
+s_ps2_transmitter.PS2_STATE_7_TRANSMISSION_ERROR 1 0 0 0 0 0 0 1 
+
+State Machine - |synthesizer|keyboard_tracker:kt0|PS2_Controller:core_driver|Altera_UP_PS2_Data_In:PS2_Data_In|s_ps2_receiver
+Name s_ps2_receiver.PS2_STATE_3_PARITY_IN s_ps2_receiver.PS2_STATE_2_DATA_IN s_ps2_receiver.PS2_STATE_1_WAIT_FOR_DATA s_ps2_receiver.PS2_STATE_0_IDLE s_ps2_receiver.PS2_STATE_4_STOP_IN 
+s_ps2_receiver.PS2_STATE_0_IDLE 0 0 0 0 0 
+s_ps2_receiver.PS2_STATE_1_WAIT_FOR_DATA 0 0 1 1 0 
+s_ps2_receiver.PS2_STATE_2_DATA_IN 0 1 0 1 0 
+s_ps2_receiver.PS2_STATE_3_PARITY_IN 1 0 0 1 0 
+s_ps2_receiver.PS2_STATE_4_STOP_IN 0 0 0 1 1 

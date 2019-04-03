@@ -1,0 +1,16 @@
+module phase_counter(clock, reset, phase_counter_out);
+	input clock;
+	input reset;
+	output reg [7:0] phase_counter_out;
+	
+	always @ (posedge clock) begin
+		if (reset) begin
+			phase_counter_out <= 0;
+			end
+		else begin
+			phase_counter_out <= phase_counter_out + 8'd1;
+		end
+		end
+
+endmodule
+
