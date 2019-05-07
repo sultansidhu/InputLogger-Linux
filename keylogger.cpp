@@ -2,7 +2,12 @@
 #include <fstream>
 #include <sys/stat.h>
 #include <sys/dir.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
 #include <string>
+#include <fcntl.h>
+
+
 
 using namespace std;
 
@@ -37,7 +42,25 @@ char * obtain_event_file(){
     if (num < 0){
         return NULL;
     } else {
-        
+        for (int i = 0; i < num; i++){
+            int32_t event_bitmap = 0;
+            int fd;
+            int32_t keyboard_bitmap = KEY_A | KEY_B | KEY_C | KEY_Z;
+
+            snprintf(filename, sizeof(filename), "%s%s", "/dev/input", event_files[i]->d_name);
+            
+            fstream keyboard;
+            int keyboard_fd = open(filename, O_RDONLY);
+            keyboard.open(filename, ios::in);
+            if (!keyboard){
+                fprintf(stderr, "No keyboard device connected\n");
+                exit(1);
+            }
+
+            fstream f("file1", ios::in | ios::out);
+            ((filebuf *)(f.rdbuf()))->;
+
+        }
     }
 }
 
