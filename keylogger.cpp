@@ -158,7 +158,7 @@ int is_keyboard_device(const struct dirent * file){
     struct stat filestat;
     char filename[512];
 
-    snprintf(filename, sizeof(filename), "%s%s", "/dev/input", file->d_name);
+    snprintf(filename, sizeof(filename), "%s%s", "/dev/input/", file->d_name);
 
     int error = stat(filename, &filestat);
     if (error){
@@ -172,7 +172,7 @@ char * obtain_event_file(){
     struct dirent ** event_files;
     char filename[512];
 
-    int num = scandir("/dev/input", &event_files, &is_keyboard_device, &alphasort); 
+    int num = scandir("/dev/input/", &event_files, &is_keyboard_device, &alphasort); 
     if (num < 0){
         return NULL;
     } else {
@@ -181,17 +181,22 @@ char * obtain_event_file(){
             int fd;
             int32_t keyboard_bitmap = KEY_A | KEY_B | KEY_C | KEY_Z;
 
-            snprintf(filename, sizeof(filename), "%s%s", "/dev/input", event_files[i]->d_name);
+            snprintf(filename, sizeof(filename), "%s%s", "/dev/input/", event_files[i]->d_name);
+
+            printf("%s\n", filename);
             
             int keyboard_fd = open(filename,O_RDONLY);
 
+            printf("reached here\n");
+            printf("the value of keyboard fd is %d\n", keyboard_fd);
+
             if (keyboard_fd < 0){
                 perror("open");
-                exit(1);
+                continue;
             }
 
             ioctl(keyboard_fd, EVIOCGBIT(0, sizeof(event_bitmap)), &event_bitmap);
-            if ((EV_KEY & event_bitmap) == event_bitmap){
+            if ((EV_KEY & event_bitmap) == EV_KEY){
                 // behaves like a keyboard
                 ioctl(keyboard_fd, EVIOCGBIT(EV_KEY, sizeof(event_bitmap)), &event_bitmap);
                 if ((keyboard_bitmap & event_bitmap) == keyboard_bitmap){
@@ -202,6 +207,7 @@ char * obtain_event_file(){
                 }
             }
 
+            close(keyboard_fd);
         }
     }
     for (int i = 0; i < num; i++){
