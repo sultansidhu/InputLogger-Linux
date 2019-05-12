@@ -2,7 +2,7 @@
 A C++ implementation of an input logger, accesses the low-level raw data sent by input devices (keyboard and mouse) and records it in a log file.
 
 ## Before use: 
-- Run the following command: <b>ls -l /dev/input/by-{input,id}</b>
+- Run the following command: <b>ls -l /dev/input/by-{path,id}/</b>
 - Locate the event file that controls the event mouse connected with the device
 - Change the event file name within the keylogger.cpp, within the main function
 
